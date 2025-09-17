@@ -8,6 +8,21 @@ import altair as alt
 import pydeck as pdk
 import altair as alt
 
+import os, pathlib, streamlit as st
+
+# Current working directory
+st.write("Current working directory:", os.getcwd())
+
+# List files in the working directory
+files_here = sorted([p.name for p in pathlib.Path('.').glob('*')])
+st.write("Files in CWD:", files_here)
+
+# Also list files next to this script
+here = pathlib.Path(__file__).parent.resolve()
+st.write("Script directory:", here)
+st.write("Files in script directory:", sorted([p.name for p in here.glob('*')]))
+
+
 
 def atlas_theme():
     return {

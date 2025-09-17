@@ -1,18 +1,2 @@
 # Ignore heavy shapefiles
-tl_2024_us_county/
-cb_2024_us_county_500k/
-*.shp
-*.shx
-*.dbf
-*.prj
-*.cpg
-tl_2024_us_county.shp
-cb_2024_us_county_500k/
-.DS_Store
-*.iso.xml
-*.shp
-*.shx
-*.dbf
-*.prj
-*.cpg
-data/
+

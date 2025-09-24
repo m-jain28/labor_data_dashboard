@@ -340,9 +340,22 @@ with st.sidebar:
     group = st.radio("Group", ["Total", "Male", "Female"], horizontal=True)
     n_bins = st.slider("Number of bins", 5, 9, 7)
 
+    import us  # put this at the very top of your file with other imports
+
     # State filter (optional)
+    STATE_FIPS_TO_NAME = {s.fips: s.name for s in us.states.STATES}
+    STATE_NAME_TO_FIPS = {s.name: s.fips for s in us.states.STATES}
+
     states = sorted(panel["state_fips"].dropna().unique().tolist())
-    state_choice = st.selectbox("Filter by State (optional)", ["All states"] + states, index=0)
+    state_names = [STATE_FIPS_TO_NAME.get(fips, fips) for fips in states]
+
+    state_choice_name = st.selectbox("Filter by State (optional)", ["All states"] + state_names, index=0)
+
+    if state_choice_name == "All states":
+        state_choice = "All states"
+    else:
+        state_choice = STATE_NAME_TO_FIPS[state_choice_name]
+
 
 # Active column
 col_map = {"Total": "total", "Male": "male", "Female": "female"}

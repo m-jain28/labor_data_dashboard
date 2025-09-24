@@ -100,28 +100,81 @@ def pick_rgba(v, bins, ramp=COLOR_RAMP):
             return ramp[min(i, len(ramp) - 1)] + [220]
     return ramp[-1] + [220]
 
-def legend_html(bins, ramp, title):
-    # Build a small HTML legend (low→high)
-    rows = []
-    for i in range(len(bins) - 1):
+def legend_html(bins, ramp, title, cols: int | None = None):
+    """
+    Render a compact multi-column legend.
+    - bins: array-like of bin edges (length = n_bins + 1)
+    - ramp: list of RGB colors [[r,g,b], ...] (light -> dark)
+    - title: legend title
+    - cols: number of columns. If None, chooses 3 when >=7 bins else 2
+    """
+    n_classes = len(bins) - 1
+    if cols is None:
+        cols = 3 if n_classes >= 7 else 2
+
+    items_html = []
+    for i in range(n_classes):
         lo = bins[i]
         hi = bins[i + 1]
         c = ramp[min(i, len(ramp) - 1)]
         color = f"rgb({c[0]}, {c[1]}, {c[2]})"
-        rows.append(
-            f'<div style="display:flex;align-items:center;margin:2px 0">'
-            f'<div style="width:18px;height:12px;background:{color};border:1px solid #444;margin-right:6px"></div>'
-            f'<div style="font-size:12px">{lo:,.2f} – {hi:,.2f}</div>'
-            f'</div>'
+        items_html.append(
+            f'''
+            <div class="leg-item">
+              <span class="sw" style="background:{color}"></span>
+              <span class="lb">{lo:,.2f} – {hi:,.2f}</span>
+            </div>
+            '''
         )
-    block = (
-        f'<div style="background:#fff;border:1px solid #999;border-radius:6px;padding:8px 10px;'
-        f'box-shadow:0 1px 4px rgba(0,0,0,0.2);max-width:220px">'
-        f'<div style="font-weight:600;margin-bottom:6px">{title}</div>'
-        f'{"".join(rows)}'
-        f'</div>'
-    )
-    return block
+
+    html = f"""
+    <div class="legend-box">
+      <div class="legend-title">{title}</div>
+      <div class="legend-grid">
+        {''.join(items_html)}
+      </div>
+    </div>
+
+    <style>
+      .legend-box {{
+        background:#fff;
+        border:1px solid #dee2e6;
+        border-radius:8px;
+        padding:10px 12px;
+        box-shadow:0 1px 4px rgba(0,0,0,.08);
+        display:inline-block;
+        font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      }}
+      .legend-title {{
+        font-weight:700;
+        margin-bottom:6px;
+        color:#343a40;
+      }}
+      .legend-grid {{
+        display:grid;
+        grid-template-columns: repeat({cols}, max-content);
+        grid-column-gap:16px;
+        grid-row-gap:6px;
+        align-items:center;
+      }}
+      .leg-item {{
+        display:flex;
+        align-items:center;
+        white-space:nowrap;
+        line-height:1.1;
+      }}
+      .sw {{
+        width:16px;
+        height:12px;
+        border:1px solid #666;
+        margin-right:6px;
+        display:inline-block;
+      }}
+      .lb {{ color:#495057; font-size:12px; }}
+    </style>
+    """
+    return html
+
 
 # ============== MAP (pydeck + Carto) ==============
 # ============== MAP (pydeck + Carto) ==============
@@ -240,8 +293,8 @@ def make_deck_map(
 
 
 # ============== APP ==============
-st.title("U.S. County Labor Dashboard (ACS 5-year)")
-st.caption("Opportunity-Atlas-style: choose year, metric, group, and state; hover counties for details. Pan/zoom is clamped to the U.S.")
+st.title("U.S. Labor Dashboard")
+st.caption("Choose year, metric, group, and (optional) state; hover counties for details.")
 
 # Load data
 if not os.path.exists(CSV_PATH):
@@ -318,7 +371,7 @@ deck, bins = make_deck_map(
 st.pydeck_chart(deck, use_container_width=True, height=650)
 
 st.markdown(
-    legend_html(bins, COLOR_RAMP, title=f"{metric_label} — {group}"),
+    legend_html(bins, COLOR_RAMP, title=f"{metric_label} — {group}", cols=4),  # try cols=3
     unsafe_allow_html=True,
 )
 

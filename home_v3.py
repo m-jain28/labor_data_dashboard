@@ -304,7 +304,7 @@ st.markdown(
 )
 
 # ---------- LAYOUT ----------
-left, right = st.columns([1.55, 0.45], gap="large")
+left, right = st.columns([1.65, 0.45], gap="large")
 
 with left:
     st.markdown('<div class="hero-title">LABOR MARKET <br>DASHBOARD</div>', unsafe_allow_html=True)
@@ -332,7 +332,7 @@ with right:
     if st.button(
         "County\n"
         "Labor Statistics\n"
-        "— Male,Female,Overall",
+        "— Overall, Male, Female\n",
         key="tile_outcomes"
     ):
         st.switch_page("pages/dashboard_v5.py")
@@ -340,9 +340,9 @@ with right:
     if st.button(
         "County\n"
         "Occupation Structure\n"
-        "— Male,Female,Overall",
+        "— Overall, Male, Female\n",
         key="tile_trends"
     ):
-        st.switch_page("pages/dashboard_v5.py")
+        st.switch_page("pages/dashboard_v6.py")
 
     st.markdown("</div></div>", unsafe_allow_html=True)  # closes #oa-cards and .right-rail
